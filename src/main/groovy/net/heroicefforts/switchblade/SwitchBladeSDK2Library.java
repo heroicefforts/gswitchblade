@@ -16,12 +16,26 @@ public interface SwitchBladeSDK2Library extends StdCallLibrary {
 	int RzSBStop();
 
 	int RzSBSetImageDynamicKey(int key, int keyState, WString iconPath);
+	int RzSBSetImageTouchpad(WString iconPath);
 	
 	int RzSBDynamicKeySetCallback(DynamicKeyState state);
+	
+	int RzSBAppEventSetCallback(AppEventCallback cb);
 	
 	interface DynamicKeyState extends StdCallCallback {
         int invoke(int key, int keyState);
     }
 	
+	interface AppEventCallback extends StdCallCallback {
+		int invoke(int appEvent, int wparam, int lparam);
+	}
+	
+	int RzSBGestureSetCallback(GestureCallback gb);
+	
+	interface GestureCallback extends StdCallCallback {
+		int invoke(int gesture, int dwParams, short x, short y, short z);
+	}
+	
 	public static final int INVALID_ARG = 0x80070057;
+	
 }
