@@ -38,6 +38,11 @@ class SwitchbladeDriver {
 		this.currentState.states.each { k, KeyState v ->
 			sdk.RzSBSetImageDynamicKey(k, 1, new WString(v.upImagePath))
 		}
+		def undefinedKeys = new HashSet(1..10)
+		undefinedKeys.removeAll(this.currentState.states.keySet())
+		undefinedKeys.each {
+			sdk.RzSBSetImageDynamicKey(it, 1, new WString("./resources/icons/blank.png"))
+		}
 	}
 	
 	public void start(SwitchbladeState state) {
