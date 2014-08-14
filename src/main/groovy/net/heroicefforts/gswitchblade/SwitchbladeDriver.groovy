@@ -22,16 +22,17 @@ import net.heroicefforts.gswitchblade.SwitchbladeState.KeyState
  * Groovy wrapper around the Switchblade JNA interface.<br/>
  * <br/>
  * The following dynamic methods are provided in addition to the static:<br/>
+ * <blockquote>
+ * <span style="color:limegreen;">setKey<i>N</i>UpImage(String pathToCorrectlySizedImageFile)</span>, where N is 1 to ...<br/>
+ * <span style="color:limegreen;">setKey<i>N</i>DownImage(String pathToCorrectlySizedImageFile)</span>, where N is 1 to ...<br/>
  * <br/>
- * setKeyNUpImage(String pathToCorrectlySizedImageFile), where N is 1 to ...<br/>
- * setKeyNDownImage(String pathToCorrectlySizedImageFile), where N is 1 to ...<br/>
+ * <span style="color:limegreen;text-decoration: line-through;">renderToKey<i>N</i>(BufferedImage)</span>, where N is 1 to ... (Not presently working -- Razer bug)<br/>
+ * <span style="color:limegreen;text-decoration: line-through;">renderToKey<i>N</i>(Closure g2dwork)</span>, where N is 1 to ... (Not presently working -- Razer bug)<br/>
  * <br/>
- * renderToKeyN(BufferedImage), where N is 1 to ... (Not presently working -- Razer bug)<br/>
- * renderToKeyN(Closure g2dwork), where N is 1 to ... (Not presently working -- Razer bug)<br/>
- * <br/>
- * renderToTouchPad(BufferedImage)
- * renderToTouchPad(Closure g2dwork), where g2dwork is a drawing closure of form:
- * Closure(Graphics2d d, int width, int height)<br/>
+ * <span style="color:limegreen;">renderToTouchPad(BufferedImage)</span><br/>
+ * <span style="color:limegreen;">renderToTouchPad(Closure g2dwork)</span>, where g2dwork is a drawing closure of form:<br/>
+ * 		Closure(Graphics2d d, int width, int height)<br/>
+ * </blockquote>
  * 
  * @author jevans
  *

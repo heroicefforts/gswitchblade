@@ -8,8 +8,10 @@ import groovy.transform.ToString
  * Aggregates the states of Switchblade keys and widget.<br/>
  * <br/>
  * Defines the following dynamic method:<br/>
- * <br/>
- * setKeyNState(String pathToKeyImage, Closure onClick), where N is 1 to ...
+ * <blockquote>
+ * <span style="color:limegreen;">setKey<i>N</i>State(String pathToKeyImage, Closure onClick)</span>, 
+ * where N is 1 to ...
+ * </blockquote>
  *  
  * @author jevans
  *
