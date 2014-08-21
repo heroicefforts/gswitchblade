@@ -105,7 +105,10 @@ class SwitchbladeDriver {
 			this.currentState = state
 			this.currentState.states.each { k, KeyState v ->
 				log.debug "SetImage $k - $v.upImagePath"
-				def res = sdk.RzSBSetImageDynamicKey(k, 1, new WString(v.upImagePath))
+				if(v.upImagePath && new File(v.upImagePath).exists())
+					sdk.RzSBSetImageDynamicKey(k, 1, new WString(v.upImagePath))
+				else
+					sdk.RzSBSetImageDynamicKey(k, 1, new WString(blankIcon.absolutePath))
 			}
 			def undefinedKeys = new HashSet(1..10)
 			undefinedKeys.removeAll(this.currentState.states.keySet())
