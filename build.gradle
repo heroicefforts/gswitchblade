@@ -9,11 +9,18 @@ buildscript {
 }
 
 repositories {
+	mavenLocal()
 	mavenCentral()
+}
+
+configurations.all {
+	// check for updates every build
+	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 apply plugin: 'groovy'
 apply plugin: 'license'
+apply plugin: 'maven'
 
 dependencies {
 	compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.3.+'
@@ -24,6 +31,8 @@ dependencies {
 	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.+'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.+'
+	
+	compile group: 'net.heroicefforts', name: 'groovier', version: '0.+', changing: 'true'
 	
 	testCompile group: 'junit', name: 'junit', version: '4.+'
 }
