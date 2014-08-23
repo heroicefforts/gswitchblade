@@ -22,23 +22,23 @@
  */
 package net.heroicefforts.gswitchblade
 
-import com.sun.jna.Memory
-import com.sun.jna.Pointer
-import com.sun.jna.WString
-import com.sun.jna.platform.win32.WinDef
 import groovy.transform.PackageScope
 import groovy.util.logging.Slf4j
-import java.awt.AlphaComposite
+
 import java.awt.Graphics2D
-import java.awt.geom.Rectangle2D
-import java.awt.image.BufferedImage
-import java.awt.image.Raster
 import java.awt.RenderingHints
+import java.awt.image.BufferedImage
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
+
+import net.heroicefforts.gswitchblade.GestureListener.Direction
+import net.heroicefforts.gswitchblade.GestureListener.Rotation
+import net.heroicefforts.gswitchblade.GestureListener.Zoom
 import net.heroicefforts.gswitchblade.SwitchBladeSDK2Library.DynamicKeyState
 import net.heroicefforts.gswitchblade.SwitchBladeSDK2Library.GestureCallback
 import net.heroicefforts.gswitchblade.SwitchbladeState.KeyState
+
+import com.sun.jna.WString
 
 /**
  * Groovy wrapper around the Switchblade JNA interface.<br/>
@@ -66,6 +66,7 @@ class SwitchbladeDriver {
 	
 	private SwitchBladeSDK2Library sdk
 	private GestureCallback gestureCallback
+	private GestureListener gestureListener
 	private DynamicKeyState keyStateCallback
 	private SwitchBladeMessagePump pump
 	private SwitchbladeState currentState
@@ -81,14 +82,17 @@ class SwitchbladeDriver {
 		this(new DefaultDynamicKeyCallback(), null) 
 	}
 		
-	SwitchbladeDriver(GestureCallback gestureCallback) {
-		this(new DefaultDynamicKeyCallback(), gestureCallback) 
+	SwitchbladeDriver(GestureListener gestureListener) {
+		this(new DefaultDynamicKeyCallback(), gestureListener) 
 	}
 	
-	protected SwitchbladeDriver(DynamicKeyState keyStateCallback, GestureCallback gestureCallback) {
+	protected SwitchbladeDriver(DynamicKeyState keyStateCallback, GestureListener gestureListener) {
 		this.keyStateCallback = keyStateCallback
 		this.gestureCallback = gestureCallback
 		this.keyStateCallback.driver = this
+		this.gestureListener = gestureListener
+		if(gestureListener)
+			gestureListener.setDriver(this)
 		
 		unpackResources()
 		initRenderers() //TODO source from Capabilities API
@@ -145,8 +149,10 @@ class SwitchbladeDriver {
 				if(keyStateCallback)
 					sdk.RzSBDynamicKeySetCallback(keyStateCallback)
 					
-				if(gestureCallback)
+				if(gestureListener) {
+					this.gestureCallback = new AdaptingGestureCallback([this.gestureListener])
 					sdk.RzSBGestureSetCallback(gestureCallback)
+				}
 				
 				this.started = true;
 			}
@@ -187,7 +193,7 @@ class SwitchbladeDriver {
 	 * @param state
 	 * @param c
 	 */
-	public void with(SwitchbladeState state, Closure c) {
+	public void with(SwitchbladeState state = null, Closure c) {
 		try {
 			this.start(state)
 			c()
@@ -277,6 +283,58 @@ class SwitchbladeDriver {
 		}
 	}
 
+	private class AdaptingGestureCallback implements GestureCallback {
+		private List<GestureListener> listeners
+		
+		public AdaptingGestureCallback(List<GestureListener> listeners) {
+			this.listeners = listeners
+		}
+
+		@Override
+		public int invoke(int gesture, int dwParams, short x, short y, short z) {
+			try {
+				switch(gesture) {
+					case 1:
+						log.debug 'Press tp:{}, x:{}, y:{}', [dwParams, x, y]
+						listeners.each { it.onPress(dwParams, x, y) }
+						break
+				
+					case 2:
+						log.debug 'Tap x:{}, y:{}', x, y
+						listeners.each { it.onTap(x, y) }
+						break
+					case 4:
+						Direction direction = Direction.values()[z]
+						log.debug 'Flick tp:{}, dir:{}', dwParams, direction
+						listeners.each { it.onFlick(dwParams, direction) }
+						break
+					case 8:
+						Zoom zoom = Zoom.values()[dwParams]
+						log.debug 'Zoom {}', zoom
+						listeners.each { it.onZoom(zoom) }
+						break
+					case 16:
+						Rotation rotation = Rotation.values()[dwParams]
+						log.debug 'Rotate {}', rotation
+						listeners.each { it.onRotate(rotation) }
+						break
+					case 32:
+						log.debug 'Move x:{}, y:{}', x, y
+						listeners.each { it.onMove(x, y) }
+						break
+					case 128:
+						log.debug 'Release tp:{}, x:{}, y:{}', [dwParams, x, y]
+						listeners.each { it.onRelease(dwParams, x, y) }
+						break
+				}
+			}
+			catch(Exception e) {
+				log.error 'Error invoking gesture handler.', e
+			}
+			return 0;
+		}
+	}
+	
 	static {	
 		SwitchbladeDriver.metaClass.methodMissing = {String name, args ->
 			def keyImgMatcher = (name =~ /setKey([1-9]|10)(Up|Down)Image/)
