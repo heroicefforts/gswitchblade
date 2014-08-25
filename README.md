@@ -25,7 +25,7 @@ GestureEmitter - Echos gesture events emitted by the touchpad.
 
 Other Projects
 --------------
-This project is targetted more for standalone roll-your-own apps written by hell-bent Groovy/Java developers.  If you are looking to deploy on the Synapse platform, then you may be interested in the native C# library [SharBlade](https://github.com/SharpBlade/SharpBlade).
+This project is targetted more for standalone roll-your-own apps written by hell-bent Groovy/Java developers.  If you are looking to deploy on the Synapse platform, then you may be interested in the native C# library [SharpBlade](https://github.com/SharpBlade/SharpBlade).
 
 Thanks
 ------
