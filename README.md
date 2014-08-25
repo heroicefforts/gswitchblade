@@ -20,7 +20,7 @@ Sample Code
 -----------
 Sample scripts are available in the test tree:
 
-- FontSampler - Allows paging through Lorem Ipsum of various system Fonts and sizes.
+- FontSampler - Allows paging through Lorem Ipsum of various system fonts and sizes.
 - GestureEmitter - Echos gesture events emitted by the touchpad.
 
 Other Projects
