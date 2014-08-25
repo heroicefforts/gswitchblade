@@ -60,4 +60,11 @@ jar {
 	}
 }
 
-defaultTasks 'licenseMain', 'licenseTest', 'assemble', 'groovydoc'
+task dist(dependsOn:jar, type:Zip) {
+	from jar.outputs.files
+	from(configurations.runtime.files) {
+		into 'libs'
+	}
+}
+
+defaultTasks 'licenseMain', 'licenseTest', 'build', 'groovydoc', 'install'
